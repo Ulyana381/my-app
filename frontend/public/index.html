@@ -2,13 +2,520 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Моё приложение</title>
-    <link rel="manifest" href="/manifest.json">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Трекер привычек</title>
     <meta name="theme-color" content="#4a90e2">
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%234a90e2'/%3E%3Ctext x='50' y='67' font-size='50' text-anchor='middle' fill='white'%3E✅%3C/text%3E%3C/svg%3E">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f0f2f5;
+            padding: 16px;
+            transition: background 0.3s, color 0.3s;
+        }
+
+        body.dark {
+            background: #1a1a1a;
+            color: #fff;
+        }
+
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        /* Карточки */
+        .card {
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transition: background 0.3s;
+        }
+
+        body.dark .card {
+            background: #2d2d2d;
+        }
+
+        /* Заголовки */
+        h1 {
+            font-size: 28px;
+            margin-bottom: 8px;
+        }
+
+        h2 {
+            font-size: 18px;
+            margin-bottom: 16px;
+            color: #333;
+        }
+
+        body.dark h2 {
+            color: #ddd;
+        }
+
+        /* Навигация */
+        .nav {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .nav-btn {
+            flex: 1;
+            padding: 12px;
+            background: #e0e0e0;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .nav-btn.active {
+            background: #4a90e2;
+            color: white;
+        }
+
+        body.dark .nav-btn {
+            background: #444;
+            color: #fff;
+        }
+
+        body.dark .nav-btn.active {
+            background: #4a90e2;
+        }
+
+        /* Привычки */
+        .habit-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        body.dark .habit-item {
+            border-bottom-color: #444;
+        }
+
+        .habit-name {
+            font-size: 16px;
+            font-weight: 500;
+        }
+
+        .habit-points {
+            font-size: 12px;
+            color: #4a90e2;
+            margin-top: 4px;
+        }
+
+        .check-btn {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            border: 2px solid #4a90e2;
+            background: white;
+            color: #4a90e2;
+            font-size: 24px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .check-btn.checked {
+            background: #4a90e2;
+            color: white;
+        }
+
+        .points {
+            font-size: 20px;
+            font-weight: bold;
+            color: #4a90e2;
+            margin-top: 16px;
+            text-align: center;
+        }
+
+        /* Заметки */
+        .note-input-group {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .note-input {
+            flex: 1;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 12px;
+            font-size: 14px;
+        }
+
+        body.dark .note-input {
+            background: #444;
+            border-color: #555;
+            color: white;
+        }
+
+        .add-note-btn {
+            padding: 12px 20px;
+            background: #4a90e2;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+        }
+
+        .note-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        body.dark .note-item {
+            border-bottom-color: #444;
+        }
+
+        .note-text {
+            font-size: 14px;
+        }
+
+        .delete-note {
+            background: #ff4444;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        /* Статистика */
+        .stat-card {
+            background: #f5f5f5;
+            padding: 16px;
+            border-radius: 16px;
+            margin-bottom: 12px;
+            text-align: center;
+        }
+
+        body.dark .stat-card {
+            background: #444;
+        }
+
+        .stat-value {
+            font-size: 32px;
+            font-weight: bold;
+            color: #4a90e2;
+        }
+
+        /* Кнопка темы */
+        .theme-btn {
+            width: 100%;
+            padding: 12px;
+            background: #e0e0e0;
+            border: none;
+            border-radius: 12px;
+            font-size: 14px;
+            cursor: pointer;
+            margin-top: 8px;
+        }
+
+        body.dark .theme-btn {
+            background: #444;
+            color: white;
+        }
+
+        /* Дата */
+        .date-picker {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 12px;
+            font-size: 14px;
+            margin-top: 8px;
+        }
+
+        body.dark .date-picker {
+            background: #444;
+            border-color: #555;
+            color: white;
+        }
+
+        .empty-text {
+            text-align: center;
+            color: #999;
+            padding: 20px;
+        }
+    </style>
 </head>
 <body>
-    <div id="app"></div>
-    <script type="module" src="/src/main.js"></script>
+<div class="container">
+    <div class="card">
+        <h1>📅 Мой день</h1>
+        <div class="nav">
+            <button class="nav-btn active" data-tab="habits">✅ Привычки</button>
+            <button class="nav-btn" data-tab="notes">📝 Заметки</button>
+            <button class="nav-btn" data-tab="stats">📊 Прогресс</button>
+        </div>
+        <button class="theme-btn" id="themeToggle">🌙 Тёмная тема</button>
+    </div>
+
+    <!-- Вкладка Привычки -->
+    <div id="habitsTab" class="tab">
+        <div class="card">
+            <h2>Привычки на сегодня</h2>
+            <div id="habitsList"></div>
+            <div class="points">⭐ Баллов: <span id="points">0</span></div>
+        </div>
+        <div class="card">
+            <h2>Выбрать другой день</h2>
+            <input type="date" id="datePicker" class="date-picker">
+        </div>
+    </div>
+
+    <!-- Вкладка Заметки -->
+    <div id="notesTab" class="tab" style="display:none">
+        <div class="card">
+            <h2>Мои заметки</h2>
+            <div class="note-input-group">
+                <input type="text" id="noteInput" class="note-input" placeholder="Что нужно запомнить?">
+                <button id="addNoteBtn" class="add-note-btn">Добавить</button>
+            </div>
+            <div id="notesList"></div>
+        </div>
+    </div>
+
+    <!-- Вкладка Прогресс -->
+    <div id="statsTab" class="tab" style="display:none">
+        <div class="card">
+            <h2>Моя статистика</h2>
+            <div id="statsInfo"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // ========== ДАННЫЕ ==========
+    const habits = [
+        { id: 1, name: "💧 Вода (8 стаканов)", points: 1 },
+        { id: 2, name: "😴 Сон (8 часов)", points: 1 },
+        { id: 3, name: "🚶 Прогулка (30 мин)", points: 2 },
+        { id: 4, name: "🏋️ Зарядка", points: 2 },
+        { id: 5, name: "📚 Чтение (20 мин)", points: 1 }
+    ];
+
+    // Загрузка данных из localStorage
+    let taskData = JSON.parse(localStorage.getItem('habitData')) || {};
+    let notes = JSON.parse(localStorage.getItem('notes')) || [];
+
+    // Сохранение
+    function saveData() {
+        localStorage.setItem('habitData', JSON.stringify(taskData));
+        localStorage.setItem('notes', JSON.stringify(notes));
+    }
+
+    // Текущая дата
+    function getToday() {
+        return new Date().toISOString().slice(0, 10);
+    }
+
+    let currentDate = getToday();
+
+    // ========== ПРИВЫЧКИ ==========
+    function renderHabits() {
+        const container = document.getElementById('habitsList');
+        if (!container) return;
+        
+        const dayData = taskData[currentDate] || {};
+        let points = 0;
+        let html = '';
+        
+        habits.forEach(habit => {
+            const done = dayData[habit.id];
+            if (done) points += habit.points;
+            html += `
+                <div class="habit-item">
+                    <div>
+                        <div class="habit-name">${habit.name}</div>
+                        <div class="habit-points">+${habit.points} баллов</div>
+                    </div>
+                    <button class="check-btn ${done ? 'checked' : ''}" data-id="${habit.id}">${done ? '✓' : '○'}</button>
+                </div>
+            `;
+        });
+        
+        container.innerHTML = html;
+        document.getElementById('points').innerText = points;
+        
+        // Обработчики кнопок
+        document.querySelectorAll('.check-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const id = parseInt(btn.dataset.id);
+                if (!taskData[currentDate]) taskData[currentDate] = {};
+                if (taskData[currentDate][id]) {
+                    delete taskData[currentDate][id];
+                } else {
+                    taskData[currentDate][id] = true;
+                }
+                saveData();
+                renderHabits();
+                renderStats();
+            });
+        });
+    }
+
+    // ========== ЗАМЕТКИ ==========
+    function renderNotes() {
+        const container = document.getElementById('notesList');
+        if (!container) return;
+        
+        if (notes.length === 0) {
+            container.innerHTML = '<div class="empty-text">📭 Нет заметок. Создайте первую!</div>';
+            return;
+        }
+        
+        let html = '';
+        notes.forEach((note, index) => {
+            html += `
+                <div class="note-item">
+                    <span class="note-text">📝 ${escapeHtml(note.text)}</span>
+                    <button class="delete-note" data-index="${index}">Удалить</button>
+                </div>
+            `;
+        });
+        container.innerHTML = html;
+        
+        document.querySelectorAll('.delete-note').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const index = parseInt(btn.dataset.index);
+                notes.splice(index, 1);
+                saveData();
+                renderNotes();
+            });
+        });
+    }
+    
+    function addNote() {
+        const input = document.getElementById('noteInput');
+        const text = input.value.trim();
+        if (text) {
+            notes.unshift({ text, date: new Date().toISOString() });
+            saveData();
+            renderNotes();
+            input.value = '';
+        }
+    }
+    
+    function escapeHtml(str) {
+        return str.replace(/[&<>]/g, function(m) {
+            if (m === '&') return '&amp;';
+            if (m === '<') return '&lt;';
+            if (m === '>') return '&gt;';
+            return m;
+        });
+    }
+
+    // ========== СТАТИСТИКА ==========
+    function renderStats() {
+        const container = document.getElementById('statsInfo');
+        if (!container) return;
+        
+        let totalCompleted = 0;
+        let totalDays = 0;
+        
+        for (const [date, day] of Object.entries(taskData)) {
+            totalDays++;
+            totalCompleted += Object.keys(day).length;
+        }
+        
+        const avg = totalDays > 0 ? (totalCompleted / totalDays).toFixed(1) : 0;
+        
+        container.innerHTML = `
+            <div class="stat-card">
+                <div class="stat-value">${totalCompleted}</div>
+                <div>✅ всего выполнено привычек</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">${totalDays}</div>
+                <div>📅 дней с активностью</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">${avg}</div>
+                <div>⭐ привычек в день в среднем</div>
+            </div>
+        `;
+    }
+
+    // ========== ТЁМНАЯ ТЕМА ==========
+    let darkMode = localStorage.getItem('darkMode') === 'true';
+    
+    function applyTheme() {
+        if (darkMode) {
+            document.body.classList.add('dark');
+            document.getElementById('themeToggle').innerHTML = '☀️ Светлая тема';
+        } else {
+            document.body.classList.remove('dark');
+            document.getElementById('themeToggle').innerHTML = '🌙 Тёмная тема';
+        }
+    }
+    
+    function toggleTheme() {
+        darkMode = !darkMode;
+        localStorage.setItem('darkMode', darkMode);
+        applyTheme();
+    }
+
+    // ========== ПЕРЕКЛЮЧЕНИЕ ВКЛАДОК ==========
+    function switchTab(tab) {
+        document.getElementById('habitsTab').style.display = tab === 'habits' ? 'block' : 'none';
+        document.getElementById('notesTab').style.display = tab === 'notes' ? 'block' : 'none';
+        document.getElementById('statsTab').style.display = tab === 'stats' ? 'block' : 'none';
+        
+        document.querySelectorAll('.nav-btn').forEach(btn => {
+            btn.classList.remove('active');
+            if (btn.dataset.tab === tab) btn.classList.add('active');
+        });
+        
+        if (tab === 'stats') renderStats();
+    }
+
+    // ========== ИНИЦИАЛИЗАЦИЯ ==========
+    document.addEventListener('DOMContentLoaded', () => {
+        // Навигация
+        document.querySelectorAll('.nav-btn').forEach(btn => {
+            btn.addEventListener('click', () => switchTab(btn.dataset.tab));
+        });
+        
+        // Заметки
+        document.getElementById('addNoteBtn').addEventListener('click', addNote);
+        document.getElementById('noteInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') addNote();
+        });
+        
+        // Тема
+        document.getElementById('themeToggle').addEventListener('click', toggleTheme);
+        
+        // Дата
+        const datePicker = document.getElementById('datePicker');
+        datePicker.value = getToday();
+        datePicker.addEventListener('change', (e) => {
+            currentDate = e.target.value;
+            renderHabits();
+        });
+        
+        // Рендер всего
+        renderHabits();
+        renderNotes();
+        applyTheme();
+    });
+</script>
 </body>
 </html>

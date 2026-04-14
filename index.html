@@ -2,10 +2,10 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <link rel="manifest" href="manifest.json">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Трекер привычек</title>
+    <title>Мой день - Трекер привычек</title>
     <meta name="theme-color" content="#4a90e2">
+    <link rel="manifest" href="manifest.json">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: system-ui, sans-serif; background: #f0f2f5; padding: 16px; transition: background 0.3s; }
@@ -20,27 +20,47 @@
         .nav-btn { flex: 1; padding: 12px; background: #e0e0e0; border: none; border-radius: 12px; cursor: pointer; }
         .nav-btn.active { background: #4a90e2; color: white; }
         body.dark .nav-btn { background: #444; color: #fff; }
+        
+        /* Привычки */
         .habit-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #eee; }
         body.dark .habit-item { border-bottom-color: #444; }
         .habit-name { font-size: 16px; font-weight: 500; }
-        .habit-points { font-size: 12px; color: #4a90e2; }
+        .habit-points { font-size: 12px; color: #4a90e2; margin-top: 4px; }
         .check-btn { width: 44px; height: 44px; border-radius: 50%; border: 2px solid #4a90e2; background: white; font-size: 24px; cursor: pointer; }
         .check-btn.checked { background: #4a90e2; color: white; }
         .points { font-size: 20px; font-weight: bold; color: #4a90e2; text-align: center; margin-top: 16px; }
+        
+        /* Форма добавления привычки */
+        .add-habit-form { margin-top: 16px; padding-top: 16px; border-top: 1px solid #eee; }
+        body.dark .add-habit-form { border-top-color: #444; }
+        .add-habit-input { display: flex; gap: 8px; margin-bottom: 12px; }
+        .habit-name-input { flex: 2; padding: 10px; border: 1px solid #ddd; border-radius: 12px; font-size: 14px; }
+        .habit-points-input { flex: 1; padding: 10px; border: 1px solid #ddd; border-radius: 12px; font-size: 14px; }
+        body.dark .habit-name-input, body.dark .habit-points-input { background: #444; border-color: #555; color: white; }
+        .add-habit-btn { padding: 10px 16px; background: #4a90e2; color: white; border: none; border-radius: 12px; cursor: pointer; }
+        .delete-habit-btn { background: none; border: none; font-size: 20px; cursor: pointer; color: #ff4444; margin-left: 8px; }
+        .habit-header { display: flex; justify-content: space-between; align-items: center; }
+        
+        /* Заметки */
         .note-input-group { display: flex; gap: 8px; margin-bottom: 16px; }
         .note-input { flex: 1; padding: 12px; border: 1px solid #ddd; border-radius: 12px; }
         body.dark .note-input { background: #444; color: white; }
         .add-note-btn { padding: 12px 20px; background: #4a90e2; color: white; border: none; border-radius: 12px; cursor: pointer; }
         .note-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #eee; }
         .delete-note { background: #ff4444; color: white; border: none; padding: 6px 12px; border-radius: 8px; cursor: pointer; }
+        
+        /* Статистика */
         .stat-card { background: #f5f5f5; padding: 16px; border-radius: 16px; margin-bottom: 12px; text-align: center; }
         body.dark .stat-card { background: #444; }
         .stat-value { font-size: 32px; font-weight: bold; color: #4a90e2; }
+        
+        /* Кнопки */
         .theme-btn { width: 100%; padding: 12px; background: #e0e0e0; border: none; border-radius: 12px; margin-top: 8px; cursor: pointer; }
         body.dark .theme-btn { background: #444; color: white; }
         .date-picker { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 12px; margin-top: 8px; }
         body.dark .date-picker { background: #444; color: white; }
         .empty-text { text-align: center; color: #999; padding: 20px; }
+        .small-text { font-size: 12px; color: #999; margin-top: 8px; text-align: center; }
     </style>
 </head>
 <body>
@@ -55,11 +75,23 @@
         <button class="theme-btn" id="themeToggle">🌙 Тёмная тема</button>
     </div>
 
+    <!-- Вкладка Привычки -->
     <div id="habitsTab" class="tab">
         <div class="card">
             <h2>Привычки на сегодня</h2>
             <div id="habitsList"></div>
             <div class="points">⭐ Баллов: <span id="points">0</span></div>
+            
+            <!-- Форма добавления новой привычки -->
+            <div class="add-habit-form">
+                <h3 style="font-size: 14px; margin-bottom: 12px;">➕ Добавить свою привычку</h3>
+                <div class="add-habit-input">
+                    <input type="text" id="newHabitName" class="habit-name-input" placeholder="Название привычки">
+                    <input type="number" id="newHabitPoints" class="habit-points-input" placeholder="Баллы" value="1" min="1">
+                    <button id="addHabitBtn" class="add-habit-btn">Добавить</button>
+                </div>
+                <div class="small-text">💡 Совет: привычка удаляется, если нажать на неё правой кнопкой мыши</div>
+            </div>
         </div>
         <div class="card">
             <h2>Выбрать другой день</h2>
@@ -67,6 +99,7 @@
         </div>
     </div>
 
+    <!-- Вкладка Заметки -->
     <div id="notesTab" class="tab" style="display:none">
         <div class="card">
             <h2>Мои заметки</h2>
@@ -78,6 +111,7 @@
         </div>
     </div>
 
+    <!-- Вкладка Прогресс -->
     <div id="statsTab" class="tab" style="display:none">
         <div class="card">
             <h2>Моя статистика</h2>
@@ -87,20 +121,66 @@
 </div>
 
 <script>
-    const habits = [
+    // ========== ДАННЫЕ ==========
+    // Загружаем привычки из localStorage или используем стандартные
+    let habits = JSON.parse(localStorage.getItem('habits')) || [
         { id: 1, name: "💧 Вода (8 стаканов)", points: 1 },
         { id: 2, name: "😴 Сон (8 часов)", points: 1 },
         { id: 3, name: "🚶 Прогулка (30 мин)", points: 2 },
         { id: 4, name: "🏋️ Зарядка", points: 2 },
         { id: 5, name: "📚 Чтение (20 мин)", points: 1 }
     ];
-
+    
+    let nextId = habits.length > 0 ? Math.max(...habits.map(h => h.id)) + 1 : 1;
+    
     let taskData = JSON.parse(localStorage.getItem('habitData')) || {};
     let notes = JSON.parse(localStorage.getItem('notes')) || [];
 
-    function saveData() {
+    function saveAll() {
+        localStorage.setItem('habits', JSON.stringify(habits));
         localStorage.setItem('habitData', JSON.stringify(taskData));
         localStorage.setItem('notes', JSON.stringify(notes));
+    }
+
+    // Добавление новой привычки
+    function addHabit() {
+        const nameInput = document.getElementById('newHabitName');
+        const pointsInput = document.getElementById('newHabitPoints');
+        const name = nameInput.value.trim();
+        const points = parseInt(pointsInput.value) || 1;
+        
+        if (name === '') {
+            alert('Введите название привычки');
+            return;
+        }
+        
+        habits.push({
+            id: nextId++,
+            name: name,
+            points: points
+        });
+        
+        saveAll();
+        nameInput.value = '';
+        pointsInput.value = '1';
+        renderHabits();
+        renderStats();
+    }
+    
+    // Удаление привычки
+    function deleteHabit(habitId) {
+        if (confirm('Удалить привычку? Все данные по ней будут потеряны.')) {
+            habits = habits.filter(h => h.id !== habitId);
+            // Удаляем данные о выполнении этой привычки
+            for (let date in taskData) {
+                if (taskData[date][habitId]) {
+                    delete taskData[date][habitId];
+                }
+            }
+            saveAll();
+            renderHabits();
+            renderStats();
+        }
     }
 
     function getToday() { return new Date().toISOString().slice(0,10); }
@@ -112,20 +192,38 @@
         const dayData = taskData[currentDate] || {};
         let points = 0;
         let html = '';
-        habits.forEach(h => {
-            const done = dayData[h.id];
-            if (done) points += h.points;
-            html += `<div class="habit-item"><div><div class="habit-name">${h.name}</div><div class="habit-points">+${h.points} баллов</div></div><button class="check-btn ${done ? 'checked' : ''}" data-id="${h.id}">${done ? '✓' : '○'}</button></div>`;
+        
+        habits.forEach(habit => {
+            const done = dayData[habit.id];
+            if (done) points += habit.points;
+            html += `
+                <div class="habit-item" oncontextmenu="event.preventDefault(); deleteHabit(${habit.id})">
+                    <div>
+                        <div class="habit-name">${escapeHtml(habit.name)}</div>
+                        <div class="habit-points">+${habit.points} баллов</div>
+                    </div>
+                    <button class="check-btn ${done ? 'checked' : ''}" data-id="${habit.id}">${done ? '✓' : '○'}</button>
+                </div>
+            `;
         });
+        
+        if (habits.length === 0) {
+            html = '<div class="empty-text">📭 Нет привычек. Добавьте свою!</div>';
+        }
+        
         container.innerHTML = html;
         document.getElementById('points').innerText = points;
+        
         document.querySelectorAll('.check-btn').forEach(btn => {
             btn.onclick = () => {
                 const id = parseInt(btn.dataset.id);
                 if (!taskData[currentDate]) taskData[currentDate] = {};
-                if (taskData[currentDate][id]) delete taskData[currentDate][id];
-                else taskData[currentDate][id] = true;
-                saveData();
+                if (taskData[currentDate][id]) {
+                    delete taskData[currentDate][id];
+                } else {
+                    taskData[currentDate][id] = true;
+                }
+                saveAll();
                 renderHabits();
                 renderStats();
             };
@@ -139,10 +237,11 @@
         let html = '';
         notes.forEach((note, i) => { html += `<div class="note-item"><span class="note-text">📝 ${escapeHtml(note.text)}</span><button class="delete-note" data-index="${i}">Удалить</button></div>`; });
         container.innerHTML = html;
-        document.querySelectorAll('.delete-note').forEach(btn => { btn.onclick = () => { notes.splice(parseInt(btn.dataset.index), 1); saveData(); renderNotes(); }; });
+        document.querySelectorAll('.delete-note').forEach(btn => { btn.onclick = () => { notes.splice(parseInt(btn.dataset.index), 1); saveAll(); renderNotes(); }; });
     }
 
-    function addNote() { const input = document.getElementById('noteInput'); const text = input.value.trim(); if (text) { notes.unshift({ text, date: new Date().toISOString() }); saveData(); renderNotes(); input.value = ''; } }
+    function addNote() { const input = document.getElementById('noteInput'); const text = input.value.trim(); if (text) { notes.unshift({ text, date: new Date().toISOString() }); saveAll(); renderNotes(); input.value = ''; } }
+    
     function escapeHtml(str) { return str.replace(/[&<>]/g, function(m) { if (m === '&') return '&amp;'; if (m === '<') return '&lt;'; if (m === '>') return '&gt;'; return m; }); }
 
     function renderStats() {
@@ -151,7 +250,12 @@
         let totalCompleted = 0, totalDays = 0;
         for (const [date, day] of Object.entries(taskData)) { totalDays++; totalCompleted += Object.keys(day).length; }
         const avg = totalDays > 0 ? (totalCompleted / totalDays).toFixed(1) : 0;
-        container.innerHTML = `<div class="stat-card"><div class="stat-value">${totalCompleted}</div><div>✅ всего выполнено</div></div><div class="stat-card"><div class="stat-value">${totalDays}</div><div>📅 дней с активностью</div></div><div class="stat-card"><div class="stat-value">${avg}</div><div>⭐ привычек в день</div></div>`;
+        container.innerHTML = `
+            <div class="stat-card"><div class="stat-value">${totalCompleted}</div><div>✅ всего выполнено</div></div>
+            <div class="stat-card"><div class="stat-value">${totalDays}</div><div>📅 дней с активностью</div></div>
+            <div class="stat-card"><div class="stat-value">${avg}</div><div>⭐ привычек в день</div></div>
+            <div class="stat-card"><div class="stat-value">${habits.length}</div><div>📋 всего привычек</div></div>
+        `;
     }
 
     let darkMode = localStorage.getItem('darkMode') === 'true';
@@ -171,9 +275,13 @@
         document.getElementById('addNoteBtn').onclick = addNote;
         document.getElementById('noteInput').onkeypress = (e) => { if (e.key === 'Enter') addNote(); };
         document.getElementById('themeToggle').onclick = toggleTheme;
+        document.getElementById('addHabitBtn').onclick = addHabit;
+        document.getElementById('newHabitName').onkeypress = (e) => { if (e.key === 'Enter') addHabit(); };
+        
         const datePicker = document.getElementById('datePicker');
         datePicker.value = getToday();
         datePicker.onchange = (e) => { currentDate = e.target.value; renderHabits(); };
+        
         renderHabits(); renderNotes(); applyTheme();
     });
 </script>
